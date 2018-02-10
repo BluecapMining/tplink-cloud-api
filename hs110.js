@@ -20,8 +20,8 @@ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License along with
 tplink-cloud-api. If not, see http://www.gnu.org/licenses/. */
 
-var TPLinkDevice = require('./device.js');
-var HS100 = require('./hs100.js');
+const TPLinkDevice = require('./device.js');
+const HS100 = require('./hs100.js');
 
 class HS110 extends HS100 {
   constructor(tpLink, deviceInfo) {
@@ -29,8 +29,11 @@ class HS110 extends HS100 {
   }
 
   async getPowerUsage() {
-    let r = await super.tplink_request({"emeter": {"get_realtime": null}})
-    return JSON.parse(JSON.parse(r).result.responseData).emeter.get_realtime
+    const r = await super.tplink_request({ emeter: { get_realtime: null } });
+    const data = JSON.parse(r);
+
+    if (data.error_code === -20571) throw new Error('DEVICE_OFFLINE');
+    return JSON.parse(JSON.parse(r).result.responseData).emeter.get_realtime;
   }
 }
 
